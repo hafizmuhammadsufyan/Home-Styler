@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Styler - Architectural Design Studio</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #f5f5f5;
+            --accent: #c9a050;
+            --text: #333;
+            --light-grey: #e8e8e8;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fff;
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.15s ease;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 20px 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* background: rgba(255, 255, 255, 0.9); */
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            font-size: 19px;
+            font-weight: 1000;
+            color: var(--primary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        #canvas-3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.4;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 1200px;
+            padding: 0 40px;
+        }
+
+        .hero-subtitle {
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .hero h1 {
+            font-size: clamp(60px, 8vw, 140px);
+            font-weight: 300;
+            line-height: 1;
+            color: var(--primary);
+            letter-spacing: -0.03em;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 strong {
+            font-weight: 600;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 60px;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 18px 50px;
+            background: var(--primary);
+            color: #fff;
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 500;
+            /* transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); */
+            border: 1px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .btn-primary:hover::before {
+            left: 0;
+        }
+
+        .btn-primary:hover {
+            border-color: var(--accent);
+        }
+
+        /* Horizontal Scroll Section */
+        .horizontal-wrap {
+            position: relative;
+            background: var(--secondary);
+        }
+
+        .horizontal-section {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .horizontal-container {
+            display: flex;
+            will-change: transform;
+        }
+
+        .horizontal-item {
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            min-width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            /* padding-left: 10px; */
+            position: relative;
+        }
+
+        .item-number {
+            position: absolute;
+            top: 50%;
+            left: 3%;
+            transform: translateY(-50%);
+            font-size: 300px;
+            font-weight: 200;
+            color: rgba(20, 20, 20, 0.151);
+            line-height: 1;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .item-content {
+            background-color: rgba(156, 156, 156, 0.326);
+            box-shadow: 6px 6px 15px #000000d7;
+            width: 40%;
+            height: 100%;
+            display: flex;
+            padding: 15px 30px;
+            backdrop-filter: blur(8px);
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            /* z-index: 2; */
+        }
+
+        .item-tag {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #ffbb32;
+            letter-spacing: 2px;
+            font-weight: 1000;
+            margin-bottom: 30px;
+        }
+
+        .item-title {
+            font-size: clamp(40px, 5vw, 70px);
+            font-weight: 500;
+            line-height: 1.1;
+            color: var(--primary);
+            margin-bottom: 30px;
+            letter-spacing: -0.02em;
+        }
+
+        .item-description {
+            font-size: 16px;
+            color: #e8e8e8;
+            font-weight: 500;
+            margin-bottom: 40px;
+        }
+
+        .item-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #ffbb32;
+            text-decoration: none;
+            font-weight: 500;
+            transition: gap 0.3s;
+        }
+
+        .item-link:hover {
+            gap: 20px;
+        }
+
+        .item-link::after {
+            content: '→';
+            transition: transform 0.3s;
+        }
+
+        /* Services Grid */
+        .services-section {
+            padding: 150px 80px;
+            background: #fff;
+        }
+
+        .section-header {
+            max-width: 800px;
+            margin-bottom: 100px;
+        }
+
+        .section-tag {
+            font-size: 20px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: clamp(50px, 6vw, 90px);
+            font-weight: 300;
+            line-height: 1.1;
+            color: var(--primary);
+            margin-bottom: 30px;
+            letter-spacing: -0.02em;
+        }
+
+        .section-description {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #666;
+            font-weight: 300;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            background: var(--light-grey);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: #fff;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--primary);
+            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+
+        .service-card:hover::before {
+            left: 0;
+        }
+
+        .service-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .service-number {
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--accent);
+            margin-bottom: 30px;
+            transition: color 0.3s;
+        }
+
+        .service-card:hover .service-number {
+            color: var(--accent);
+        }
+
+        .service-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: var(--primary);
+            transition: color 0.3s;
+        }
+
+        .service-card:hover .service-title {
+            color: #fff;
+        }
+
+        .service-description {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #666;
+            font-weight: 300;
+            transition: color 0.3s;
+        }
+
+        .service-card:hover .service-description {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Gallery Pin Section */
+        .gallery-section {
+            position: sticky;
+            background: var(--secondary);
+        }
+
+        .gallery-container {
+            /* height: 100vh; */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 80px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .gallery-item {
+            position: relative;
+            height: 60vh;
+            overflow: hidden;
+            background: #ddd;
+            cursor: pointer;
+        }
+
+        .gallery-item.large {
+            grid-column: span 2;
+            height: 70vh;
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #333 0%, #666 100%);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gallery-image img {
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .gallery-item:hover .gallery-image {
+            transform: scale(1.05);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 50px;
+            /* height: 90%; */
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0);
+        }
+
+        .gallery-category {
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .gallery-title {
+            font-size: 28px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .gallery-location {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #string {
+            width: 100%;
+            height: 300px;
+            margin-top: -220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #string svg {
+            width: 100%;
+            height: 100%;
+        }
+
+
+        /* Text Reveal */
+        .text-reveal-section {
+            padding: 200px 80px;
+            background: #fff;
+        }
+
+        .reveal-text {
+            font-size: clamp(30px, 4vw, 60px);
+            font-weight: 300;
+            line-height: 1.4;
+            max-width: 1200px;
+            margin: 0 auto;
+            letter-spacing: -0.02em;
+        }
+
+        .reveal-text span {
+            opacity: 0.15;
+            transition: opacity 0.3s;
+        }
+
+        .reveal-text span.active {
+            opacity: 1;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 150px 80px;
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            padding-left: 30px;
+        }
+
+        .stat-number {
+            font-size: 60px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 200px 80px;
+            background: var(--secondary);
+            text-align: center;
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: clamp(50px, 6vw, 90px);
+            font-weight: 300;
+            line-height: 1.1;
+            color: var(--primary);
+            margin-bottom: 40px;
+            letter-spacing: -0.02em;
+        }
+
+        .cta-description {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #666;
+            font-weight: 300;
+            margin-bottom: 60px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 100px 80px 60px;
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 80px;
+            max-width: 1400px;
+            margin: 0 auto 80px;
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-logo {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .footer-description {
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 300;
+        }
+
+        .footer-section h4 {
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 300;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .social-links a {
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 30px 30px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .services-section,
+            .text-reveal-section,
+            .stats-section,
+            .cta-section,
+            footer {
+                padding: 100px 30px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                padding: 0 30px;
+            }
+
+            .gallery-item.large {
+                grid-column: span 1;
+            }
+
+            .stats-grid,
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .cursor,
+            .cursor-dot {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">HOME STYLER</div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#portfolio">Portfolio</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <canvas id="canvas-3d"></canvas>
+        <div class="hero-content">
+            <div class="hero-subtitle">Architectural Design Studio</div>
+            <h1>Precision in Every <strong>Space</strong></h1>
+            <p class="hero-description">We transform architectural visions into reality through meticulous design,
+                innovative solutions, and uncompromising attention to detail.</p>
+            <a href="#services" class="btn-primary">Explore Our Work</a>
+        </div>
+    </section>
+
+    <!-- Horizontal Scroll Section -->
+    <div class="horizontal-wrap">
+        <div class="horizontal-section">
+            <div class="horizontal-container">
+                <div class="horizontal-item" style="background-image: url('images/crousel-bg.jpg');">
+                    <div class="item-number">01</div>
+                    <div class="item-content">
+                        <div class="item-tag">Interior Architecture</div>
+                        <h2 class="item-title">Residential Interiors</h2>
+                        <div class="item-description">
+                            <p>Sophisticated living spaces that balance form and function. Our
+                                residential designs reflect contemporary elegance while prioritizing comfort and
+                                livability.
+                            </p>
+                        </div>
+                        <a href="#" class="item-link">View Projects</a>
+                    </div>
+                </div>
+
+                <div class="horizontal-item" style="background-image: url('images/office.jpg')">
+                    <div class="item-number">02</div>
+                    <div class="item-content">
+                        <div class="item-tag">Commercial Design</div>
+                        <h2 class="item-title">Office & Workspace</h2>
+                        <div class="item-description">
+                            <p>Productive environments designed for innovation. We create
+                                workspaces that enhance collaboration, creativity, and employee wellbeing through
+                                strategic
+                                design.
+                            </p>
+                        </div>
+                        <a href="#" class="item-link">View Projects</a>
+                    </div>
+                </div>
+
+                <div class="horizontal-item" style="background-image: url('images/luxury.jpg')">
+                    <div class="item-number">03</div>
+                    <div class="item-content">
+                        <div class="item-tag">Luxury Residences</div>
+                        <h2 class="item-title">Villa & Estate Design</h2>
+                        <div class="item-description">
+                            <p>Bespoke luxury residences crafted with exceptional attention to
+                                detail. Each project is a unique expression of architectural excellence and refined
+                                living.
+                            </p>
+                        </div>
+                        <a href="#" class="item-link">View Projects</a>
+                    </div>
+                </div>
+
+                <div class="horizontal-item" style="background-image: url('images/exterior.jpg')">
+                    <div class="item-number">04</div>
+                    <div class="item-content">
+                        <div class="item-tag">Landscape Architecture</div>
+                        <h2 class="item-title">Exterior & Landscape</h2>
+                        <div class="item-description">
+                            <p>Harmonious outdoor environments that complement architectural
+                                design. We integrate landscape and structure to create cohesive, sustainable spaces.
+                            </p>
+                        </div>
+                        <a href="#" class="item-link">View Projects</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Section -->
+    <section class="services-section" id="services">
+        <div class="section-header">
+            <div class="section-tag">Our Expertise</div>
+            <h2 class="section-title">Comprehensive Design Services</h2>
+            <p class="section-description">From concept to completion, we offer integrated design solutions that elevate
+                every aspect of your project.</p>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-content">
+                    <div class="service-number">01</div>
+                    <h3 class="service-title">Architectural Consultation</h3>
+                    <p class="service-description">Strategic design guidance and feasibility studies to ensure your
+                        project's success from inception.</p>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-content">
+                    <div class="service-number">02</div>
+                    <h3 class="service-title">Space Planning</h3>
+                    <p class="service-description">Optimized layouts that maximize functionality while maintaining
+                        aesthetic integrity and flow.</p>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-content">
+                    <div class="service-number">03</div>
+                    <h3 class="service-title">Interior Architecture</h3>
+                    <p class="service-description">Complete interior solutions from concept development to detailed
+                        specifications and implementation.</p>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-content">
+                    <div class="service-number">04</div>
+                    <h3 class="service-title">Custom Furniture Design</h3>
+                    <p class="service-description">Bespoke furniture and fixtures designed specifically for your space
+                        and requirements.</p>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-content">
+                    <div class="service-number">05</div>
+                    <h3 class="service-title">Project Management</h3>
+                    <p class="service-description">End-to-end oversight ensuring timelines, budgets, and quality
+                        standards are met throughout execution.</p>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-content">
+                    <div class="service-number">06</div>
+                    <h3 class="service-title">Renovation & Restoration</h3>
+                    <p class="service-description">Sensitive modernization of existing spaces while preserving
+                        architectural character and heritage.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Pin Section -->
+    <div class="gallery-section" id="portfolio">
+        <div class="gallery-container">
+            <div class="gallery-grid">
+                <div class="gallery-item large">
+                    <div class="gallery-image"><img src="images/clifton.jpg" alt="clifton_heights"></div>
+                    <div class="gallery-overlay">
+                        <div class="gallery-category">Residential</div>
+                        <h3 class="gallery-title">Clifton Heights Residence</h3>
+                        <p class="gallery-location">Karachi, Pakistan</p>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <div class="gallery-image"><img src="images/techHub.webp" alt=""></div>
+                    <div class="gallery-overlay">
+                        <div class="gallery-category">Commercial</div>
+                        <h3 class="gallery-title">Tech Hub Office</h3>
+                        <p class="gallery-location">Lahore, Pakistan</p>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <div class="gallery-image"><img src="images/modern.jpg" alt=""></div>
+                    <div class="gallery-overlay">
+                        <div class="gallery-category">Luxury Villa</div>
+                        <h3 class="gallery-title">Modern Estate</h3>
+                        <p class="gallery-location">Islamabad, Pakistan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text Reveal Section -->
+    <section class="text-reveal-section" id="about">
+        <p class="reveal-text">
+            <span>At</span> <span>Home</span> <span>Styler,</span> <span>we</span> <span>believe</span>
+            <span>exceptional</span> <span>design</span> <span>emerges</span> <span>from</span> <span>the</span>
+            <span>intersection</span> <span>of</span> <span>creativity,</span> <span>precision,</span> <span>and</span>
+            <span>deep</span> <span>understanding</span> <span>of</span> <span>how</span> <span>people</span>
+            <span>inhabit</span> <span>spaces.</span>
+        </p>
+    </section>
+
+    <!-- SVG line effect -->
+
+    <div id="string">
+        <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+            <path d="M 10 100 Q 600 100 1190 100" stroke="black" stroke-width="1" fill="transparent" />
+        </svg>
+    </div>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">850+</div>
+                <div class="stat-label">Completed Projects</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">1200+</div>
+                <div class="stat-label">Satisfied Clients</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">65+</div>
+                <div class="stat-label">Design Awards</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">18+</div>
+                <div class="stat-label">Years Experience</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="contact">
+        <div class="cta-content">
+            <h2 class="cta-title">Let's Create Something Exceptional</h2>
+            <p class="cta-description">Whether you're planning a new build, renovation, or complete transformation, our
+                team is ready to bring your vision to life with precision and creativity.</p>
+            <a href="#" class="btn-primary">Start a Conversation</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">HOME STYLER</div>
+                <p class="footer-description">An award-winning architectural design studio specializing in residential
+                    and commercial spaces that inspire and endure.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Services</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Interior Design</a></li>
+                    <li><a href="#">Architecture</a></li>
+                    <li><a href="#">Space Planning</a></li>
+                    <li><a href="#">Consultation</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Portfolio</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul class="footer-links">
+                    <li><a href="mailto:info@homestyler.com">info@homestyler.com</a></li>
+                    <li><a href="tel:+923001234567">+92 300 1234567</a></li>
+                    <li><a href="#">Karachi, Pakistan</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Home Styler. All Rights Reserved.</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">Behance</a>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        const tl = gsap.timeline()
+        const services = document.querySelector(".services-grid")
+
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorDot = document.querySelector('.cursor-dot');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        let dotX = 0, dotY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            const speed = 0.15;
+            const dotSpeed = 0.12;
+
+            cursorX += (mouseX - cursorX) * speed;
+            cursorY += (mouseY - cursorY) * speed;
+            dotX += (mouseX - dotX) * dotSpeed;
+            dotY += (mouseY - dotY) * dotSpeed;
+
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            cursorDot.style.left = dotX + 'px';
+            cursorDot.style.top = dotY + 'px';
+
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Cursor hover effects
+        const hoverElements = document.querySelectorAll('a, button, .service-card, .gallery-item');
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(cursor, { scale: 1.5, duration: 0.3 });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursor, { scale: 1, duration: 0.3 });
+            });
+        });
+
+        // Three.js Minimal 3D Background
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById('canvas-3d'),
+            alpha: true,
+            antialias: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Create geometric shapes
+        const geometry = new THREE.IcosahedronGeometry(2, 1);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0xc9a050,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        camera.position.z = 5;
+
+        let targetX = 0, targetY = 0;
+        document.addEventListener('mousemove', (e) => {
+            targetX = (e.clientX / window.innerWidth - 0.5) * 2;
+            targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+
+            mesh.rotation.x += 0.002;
+            mesh.rotation.y += 0.003;
+
+            camera.position.x += (targetX * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (-targetY * 0.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+        animate3D();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Hero Animations
+        gsap.from('.hero-subtitle', {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            delay: 0.3,
+            ease: 'power3.out'
+        });
+
+        gsap.from('.hero h1', {
+            y: 50,
+            opacity: 0,
+            duration: 1.2,
+            delay: 0.5,
+            ease: 'power3.out'
+        });
+
+        gsap.from('.hero-description', {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            delay: 0.8,
+            ease: 'power3.out'
+        });
+
+        gsap.from('.btn-primary', {
+            y: 20,
+            opacity: 0,
+            duration: 0.8,
+            delay: 1.1,
+            ease: 'power3.out'
+        });
+
+        // Horizontal Scroll with Pin
+        const horizontalSection = document.querySelector('.horizontal-section');
+        const horizontalContainer = document.querySelector('.horizontal-container');
+
+        const horizontalScrollLength = horizontalContainer.scrollWidth - window.innerWidth;
+
+        gsap.to(horizontalContainer, {
+            x: -horizontalScrollLength,
+            ease: 'none',
+            scrollTrigger: {
+                trigger: '.horizontal-wrap',
+                start: 'top top',
+                end: () => `+=${horizontalScrollLength}`,
+                scrub: 1,
+                pin: true,
+                anticipatePin: 1,
+                invalidateOnRefresh: true
+            }
+        });
+
+        // Animate horizontal items
+        gsap.utils.toArray('.horizontal-item').forEach((item, i) => {
+            const content = item.querySelector('.item-content');
+
+            gsap.from(content, {
+                scrollTrigger: {
+                    trigger: item,
+                    // containerAnimation: gsap.to(horizontalContainer, { x: -horizontalScrollLength }),
+                    start: 'left 80%',
+                    end: 'left 20%',
+                    scrub: 1
+                },
+                x: 200,
+                opacity: 0,
+                duration:1,
+                stagger:true
+            });
+        });
+
+        services.addEventListener("mouseenter", function () {
+            gsap.to(".cursor", {
+                border: `1px solid white`
+            })
+            gsap.to(".cursor-dot", {
+                backgroundColor: "white"
+            })
+        })
+        services.addEventListener("mouseleave", function () {
+            gsap.to(".cursor-dot", {
+                backgroundColor: "var(--primary)"
+            })
+        })
+
+        // Service Cards Stagger Animation
+        gsap.from('.service-card', {
+            scrollTrigger: {
+                trigger: '.services-grid',
+                start: 'top 70%',
+                end: 'top 30%',
+                scrub: 1
+            },
+            y: 100,
+            opacity: 0,
+            stagger: 0.1
+        });
+
+        // Service card 3D tilt effect
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+
+                gsap.to(card, {
+                    rotationX: -rotateX,
+                    rotationY: rotateY,
+                    transformPerspective: 1000,
+                    duration: 0.5,
+                    ease: 'power2.out'
+                });
+            });
+
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    rotationX: 0,
+                    rotationY: 0,
+                    duration: 0.6,
+                    ease: 'power2.out'
+                });
+            });
+        });
+
+        // Gallery Pin Effect
+        // ScrollTrigger.create({
+        //     trigger: '.gallery-section',
+        //     start: 'top 30%',
+        //     end: 'top -250%',
+        //     pin: true,
+        //     scrub: 1
+        // });
+
+        // Gallery items animation
+        gsap.from('.gallery-item', {
+            scrollTrigger: {
+                trigger: '.gallery-section',
+                start: 'top 60%',
+                end: 'top -50%',
+                scrub: 1
+            },
+            scale: 0.8,
+            duration: 0.1,
+            opacity: 0,
+            stagger: 0.1
+        });
+
+        // Gallery parallax
+        gsap.utils.toArray('.gallery-item').forEach((item, i) => {
+            const image = item.querySelector('.gallery-image');
+
+            gsap.to(image, {
+                scrollTrigger: {
+                    trigger: '.gallery-section',
+                    start: 'top top',
+                    end: '+=200%',
+                    scrub: 1
+                },
+                y: -50 * (i + 1),
+                ease: 'none'
+            });
+        });
+
+        // Text Reveal Animation
+        const revealText = document.querySelector('.reveal-text');
+        const spans = revealText.querySelectorAll('span');
+
+        ScrollTrigger.create({
+            trigger: revealText,
+            start: 'top 70%',
+            end: 'bottom 30%',
+            scrub: 1,
+            onUpdate: (self) => {
+                spans.forEach((span, i) => {
+                    const progress = self.progress;
+                    const spanProgress = i / spans.length;
+
+                    if (progress > spanProgress) {
+                        span.classList.add('active');
+                    } else {
+                        span.classList.remove('active');
+                    }
+                });
+            },
+        });
+
+        // Stats Counter Animation
+        gsap.utils.toArray('.stat-number').forEach(stat => {
+            const target = stat.textContent;
+            const num = parseInt(target.replace(/[^0-9]/g, ''));
+
+            ScrollTrigger.create({
+                trigger: stat,
+                start: 'top 80%',
+                onEnter: () => {
+                    gsap.from(stat, {
+                        textContent: 0,
+                        duration: 2,
+                        snap: { textContent: 1 },
+                        ease: 'power1.inOut',
+                        onUpdate: function () {
+                            const current = Math.ceil(this.targets()[0].textContent);
+                            stat.textContent = current + target.replace(/[0-9]/g, '');
+                        }
+                    });
+                }
+            });
+        });
+
+        // Stats items stagger
+        gsap.from('.stat-item', {
+            scrollTrigger: {
+                trigger: '.stats-section',
+                start: 'top 70%',
+                end: 'top 40%',
+                scrub: 1
+            },
+            y: 50,
+            opacity: 0,
+            stagger: 0.1
+        });
+
+        // CTA Section Animation
+        tl.from('.cta-title', {
+            y: -90,
+            opacity: 0,
+            duration: 0.8,
+            scrollTrigger: {
+                trigger: '.cta-title',
+                start: 'top 70%',
+                end: 'top 40%',
+                scrub: 1
+            },
+        });
+
+        tl.from('.cta-description', {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            scrollTrigger: {
+                trigger: '.cta-title',
+                start: 'top 65%',
+                end: 'top 35%',
+                scrub: 1
+            },
+        });
+
+        // Button magnetic effect
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+
+                gsap.to(btn, {
+                    x: x * 0.2,
+                    y: y * 0.2,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                gsap.to(btn, {
+                    x: 0,
+                    y: 0,
+                    duration: 0.5,
+                    ease: 'elastic.out(1, 0.3)'
+                });
+            });
+        });
+
+        // Footer Animation
+        gsap.from('.footer-content > div', {
+            scrollTrigger: {
+                trigger: 'footer',
+                start: 'top 80%',
+                end: 'top 50%',
+                scrub: 1
+            },
+            y: 50,
+            opacity: 0,
+            stagger: 0.1
+        });
+        tl.from("nav div", {
+            y: -60,
+            opacity: 0,
+            duration: 1,
+        })
+
+        tl.from("nav ul li", {
+            y: -60,
+            opacity: 0,
+            stagger: 0.14
+        })
+
+        // Navbar background on scroll
+        gsap.to('nav', {
+            scrollTrigger: {
+                trigger: 'body',
+                start: 'top top',
+                end: '+=100',
+                scrub: true
+            },
+            boxShadow: '0 2px 20px rgba(0,0,0,0.05)',
+            ease: 'none'
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    gsap.to(window, {
+                        duration: 1.2,
+                        scrollTo: {
+                            y: target,
+                            offsetY: 100
+                        },
+                        ease: 'power3.inOut'
+                    });
+                }
+            });
+        });
+
+        // Parallax effect for sections
+        gsap.utils.toArray('section').forEach(section => {
+            gsap.to(section, {
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: 1
+                },
+                y: -30,
+                ease: 'none'
+            });
+        });
+
+        // Section headers animation
+        gsap.utils.toArray('.section-header').forEach(header => {
+            gsap.from(header, {
+                scrollTrigger: {
+                    trigger: header,
+                    start: 'top 75%',
+                    end: 'top 45%',
+                    scrub: 1
+                },
+                y: 50,
+                opacity: 0
+            });
+        });
+
+        // Item links hover effect
+        document.querySelectorAll('.item-link').forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                gsap.to(link.querySelector('::after'), {
+                    x: 10,
+                    duration: 0.3
+                });
+            });
+        });
+
+        // Nav links underline animation
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                gsap.to(link, {
+                    color: '#c9a050',
+                    duration: 0.3
+                });
+            });
+
+            link.addEventListener('mouseleave', () => {
+                gsap.to(link, {
+                    color: '#333',
+                    duration: 0.3
+                });
+            });
+        });
+
+        // Refresh ScrollTrigger on resize
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                ScrollTrigger.refresh();
+            }, 250);
+        });
+
+        // Page load animation
+        window.addEventListener('load', () => {
+            gsap.to('body', {
+                opacity: 1,
+                duration: 0.5
+            });
+        });
+
+        // Image hover scale effect
+        document.querySelectorAll('.gallery-image').forEach(img => {
+            const parent = img.closest('.gallery-item');
+
+            parent.addEventListener('mouseenter', () => {
+                gsap.to(img, {
+                    scale: 1.05,
+                    duration: 0.8,
+                    ease: 'power2.out'
+                });
+            });
+
+            parent.addEventListener('mouseleave', () => {
+                gsap.to(img, {
+                    scale: 1,
+                    duration: 0.8,
+                    ease: 'power2.out'
+                });
+            });
+        });
+
+        var initialPath = "M 10 100 Q 600 100 1190 100";
+        var finalPath = "M 10 100 Q 600 100 1190 100";
+
+        let string = document.querySelector("#string");
+
+        string.addEventListener("mousemove", function (e) {
+            const rect = string.getBoundingClientRect();
+
+            // relative mouse position
+            let x = e.clientX - rect.left;
+            let y = e.clientY - rect.top;
+
+            // control the curve height (prevent going too low)
+            controlledY = Math.max(20, Math.min(200, y));
+
+            let newPath = `M 10 100 Q ${x} ${controlledY} 1190 100`;
+
+            gsap.to("svg path", {
+                attr: { d: newPath },
+                duration: 0.3,
+                ease: "power3.out"
+            });
+        });
+
+        string.addEventListener("mouseleave", function () {
+            gsap.to("svg path", {
+                attr: { d: finalPath },
+                duration: 1,
+                ease: "elastic.out(1,0.2)"
+            });
+        });
+
+
+        var footer = document.querySelector("footer")
+
+        footer.addEventListener("mouseenter", function () {
+            gsap.to(".cursor-dot", {
+                backgroundColor: "white"
+            })
+        })
+
+        footer.addEventListener("mouseleave", function () {
+            gsap.to(".cursor-dot", {
+                backgroundColor: "black"
+            })
+        })
+    </script>
+</body>
+
+</html>
